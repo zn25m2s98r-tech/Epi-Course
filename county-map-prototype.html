@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive County Map &mdash; Prototype</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, serif;
+    background: #faf6ee;
+    color: #2d2d2d;
+    margin: 0;
+    padding: 24px;
+    line-height: 1.65;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .banner {
+    background: linear-gradient(135deg, #BE0000, #8B0000);
+    padding: 32px 28px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+    color: #ffffff;
+  }
+  .banner h1 {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    margin: 0 0 8px 0;
+    font-weight: normal;
+  }
+  .banner .subtitle {
+    font-style: italic;
+    color: #faf6ee;
+    font-size: 16px;
+  }
+  .controls {
+    background: #ffffff;
+    border: 1px solid #d8d2c2;
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .controls label {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .controls select {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    padding: 8px 14px;
+    border: 1px solid #BE0000;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #2d2d2d;
+    cursor: pointer;
+    min-width: 280px;
+  }
+  .controls select:focus {
+    outline: 2px solid #BE0000;
+    outline-offset: 2px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+  .map-card {
+    background: #ffffff;
+    border: 1px solid #d8d2c2;
+    border-radius: 6px;
+    padding: 18px;
+  }
+  .map-card svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .county {
+    cursor: pointer;
+    stroke: #ffffff;
+    stroke-width: 2;
+    transition: fill 0.4s ease, stroke 0.18s ease, filter 0.18s ease;
+  }
+  .county:hover {
+    stroke: #BE0000;
+    stroke-width: 3;
+    filter: brightness(1.06) drop-shadow(0 0 4px rgba(190,0,0,0.4));
+  }
+  .county.selected {
+    stroke: #BE0000;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 6px rgba(190,0,0,0.55));
+  }
+  .county:focus { outline: none; }
+  .county:focus-visible {
+    stroke: #BE0000;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 4px rgba(190,0,0,0.45));
+  }
+  .country-outline {
+    fill: none;
+    stroke: #3d2820;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+  .county-label {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    fill: #2d2d2d;
+    pointer-events: none;
+    text-anchor: middle;
+    font-weight: bold;
+    transition: fill 0.4s ease;
+  }
+  .county-label.dark {
+    fill: #ffffff;
+  }
+  .legend {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: #faf6ee;
+    border-left: 4px solid #BE0000;
+    border-radius: 0 4px 4px 0;
+  }
+  .legend-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  .legend-bar {
+    height: 14px;
+    border-radius: 2px;
+    margin-bottom: 6px;
+  }
+  .legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #555;
+    font-variant-numeric: tabular-nums;
+  }
+  .panel {
+    background: #ffffff;
+    border: 1px solid #d8d2c2;
+    border-radius: 6px;
+    padding: 22px 24px;
+  }
+  .panel h3 {
+    font-family: Georgia, serif;
+    color: #BE0000;
+    border-bottom: 3px solid #BE0000;
+    font-size: 22px;
+    font-weight: normal;
+    margin: 0 0 16px 0;
+    padding-bottom: 6px;
+  }
+  .panel .placeholder {
+    font-style: italic;
+    color: #777;
+    padding: 16px 0;
+  }
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ece6d4;
+    font-size: 15px;
+    gap: 12px;
+  }
+  .data-row:last-child {
+    border-bottom: none;
+  }
+  .data-label {
+    color: #555;
+  }
+  .data-value {
+    font-weight: bold;
+    color: #2d2d2d;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .data-value.highlight {
+    color: #BE0000;
+  }
+  .footnote {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+  }
+  .tooltip {
+    position: absolute;
+    background: #2d2d2d;
+    color: #faf6ee;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    line-height: 1.4;
+  }
+  .tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="banner">
+    <h1>Interactive County Map</h1>
+    <span class="subtitle">Prototype &mdash; six counties, five variables, one mysterious new disease</span>
+  </div>
+
+  <div class="controls">
+    <label for="variable-select">Color counties by:</label>
+    <select id="variable-select" aria-label="Choose a variable to color the map">
+      <option value="totalPop">Total population</option>
+      <option value="adultPop">Adult population (18+)</option>
+      <option value="crudeDM" selected>Crude diabetes prevalence (%)</option>
+      <option value="ageAdjDM">Age-adjusted diabetes prevalence (%)</option>
+      <option value="captainTrips">&ldquo;Captain Trips&rdquo; prevalence (%)</option>
+    </select>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="map-card">
+        <svg viewBox="0 0 720 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of a fictional country divided into six numbered counties">
+          <defs>
+            <filter id="country-shadow" x="-5%" y="-5%" width="110%" height="115%">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.18"/>
+            </filter>
+          </defs>
+          <g filter="url(#country-shadow)">
+            <polygon class="county" data-county="1" points="80,80 260,60 270,200 70,215"/>
+            <polygon class="county" data-county="2" points="260,60 450,50 640,85 655,220 270,200"/>
+            <polygon class="county" data-county="3" points="70,215 270,200 655,220 650,350 470,355 230,345 55,340"/>
+            <polygon class="county" data-county="4" points="470,355 650,350 605,425 480,425"/>
+            <polygon class="county" data-county="5" points="230,345 470,355 480,425 220,420"/>
+            <polygon class="county" data-county="6" points="55,340 230,345 220,420 90,415"/>
+          </g>
+          <polygon class="country-outline" points="80,80 260,60 450,50 640,85 655,220 650,350 605,425 480,425 220,420 90,415 55,340 70,215"/>
+          <text class="county-label" x="165" y="145">1</text>
+          <text class="county-label" x="445" y="135">2</text>
+          <text class="county-label" x="350" y="285">3</text>
+          <text class="county-label" x="555" y="395">4</text>
+          <text class="county-label" x="350" y="390">5</text>
+          <text class="county-label" x="135" y="385">6</text>
+        </svg>
+        <div class="legend" role="note" aria-live="polite">
+          <div class="legend-title" id="legend-title">Crude diabetes prevalence (%)</div>
+          <div class="legend-bar" id="legend-bar"></div>
+          <div class="legend-labels">
+            <span id="legend-min">low</span>
+            <span id="legend-max">high</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel" aria-live="polite">
+      <h3 id="panel-title">County Detail</h3>
+      <div id="panel-content">
+        <div class="placeholder">Hover any county for a quick read; click to lock in the full data here.</div>
+      </div>
+    </aside>
+  </div>
+
+  <p class="footnote">Prototype data is fictional. Any resemblance to real epidemiology is purely instructional.</p>
+</div>
+
+<div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+
+<script>
+  // ===== DATA =====
+  // Edit values here to change what students see in future semesters.
+  const counties = {
+    1: { totalPop:  45200, adultPop:  32800, crudeDM:  6.8, ageAdjDM:  8.1, captainTrips:  2.1 },
+    2: { totalPop: 128500, adultPop:  96400, crudeDM:  9.5, ageAdjDM:  9.3, captainTrips:  4.8 },
+    3: { totalPop: 412000, adultPop: 318600, crudeDM: 11.2, ageAdjDM: 10.0, captainTrips: 14.7 },
+    4: { totalPop:  28300, adultPop:  22500, crudeDM: 14.3, ageAdjDM:  9.7, captainTrips:  0.9 },
+    5: { totalPop:  67800, adultPop:  52100, crudeDM: 12.6, ageAdjDM: 10.5, captainTrips:  3.2 },
+    6: { totalPop:  89400, adultPop:  60900, crudeDM:  7.4, ageAdjDM:  8.8, captainTrips:  1.5 }
+  };
+
+  const variableMeta = {
+    totalPop:     { label: 'Total population',                       fmt: 'int', ramp: ['#e8eef5', '#1a3a5c'] },
+    adultPop:     { label: 'Adult population (18+)',                 fmt: 'int', ramp: ['#e8eef5', '#1a3a5c'] },
+    crudeDM:      { label: 'Crude diabetes prevalence (%)',          fmt: 'pct', ramp: ['#faece6', '#8B0000'] },
+    ageAdjDM:     { label: 'Age-adjusted diabetes prevalence (%)',   fmt: 'pct', ramp: ['#faece6', '#8B0000'] },
+    captainTrips: { label: '\u201CCaptain Trips\u201D prevalence (%)', fmt: 'pct', ramp: ['#ede4f2', '#3d1a5c'] }
+  };
+
+  // ===== HELPERS =====
+  function hexToRgb(hex) {
+    const m = hex.replace('#','').match(/.{2}/g);
+    return m.map(h => parseInt(h, 16));
+  }
+  function rgbToHex(rgb) {
+    return '#' + rgb.map(v => Math.round(v).toString(16).padStart(2,'0')).join('');
+  }
+  function interpolateColor(min, max, t) {
+    const a = hexToRgb(min);
+    const b = hexToRgb(max);
+    return rgbToHex(a.map((v, i) => v + (b[i] - v) * t));
+  }
+  function isColorDark(hex) {
+    const [r, g, b] = hexToRgb(hex);
+    return (r * 299 + g * 587 + b * 114) / 1000 < 145;
+  }
+  function formatValue(value, fmt) {
+    if (fmt === 'int') return value.toLocaleString('en-US');
+    if (fmt === 'pct') return value.toFixed(1) + '%';
+    return String(value);
+  }
+
+  // ===== STATE =====
+  let currentVar = 'crudeDM';
+  let selectedCounty = null;
+
+  // ===== RENDERING =====
+  function renderChoropleth() {
+    const meta = variableMeta[currentVar];
+    const values = Object.values(counties).map(c => c[currentVar]);
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+
+    document.querySelectorAll('.county').forEach(el => {
+      const id = el.dataset.county;
+      const v = counties[id][currentVar];
+      const t = (v - minV) / (maxV - minV || 1);
+      const color = interpolateColor(meta.ramp[0], meta.ramp[1], t);
+      el.setAttribute('fill', color);
+
+      const labels = document.querySelectorAll('.county-label');
+      const label = labels[parseInt(id, 10) - 1];
+      if (label) label.classList.toggle('dark', isColorDark(color));
+    });
+
+    document.getElementById('legend-title').textContent = meta.label;
+    document.getElementById('legend-bar').style.background =
+      `linear-gradient(to right, ${meta.ramp[0]}, ${meta.ramp[1]})`;
+    document.getElementById('legend-min').textContent = formatValue(minV, meta.fmt);
+    document.getElementById('legend-max').textContent = formatValue(maxV, meta.fmt);
+  }
+
+  function renderPanel() {
+    if (selectedCounty == null) {
+      document.getElementById('panel-title').textContent = 'County Detail';
+      document.getElementById('panel-content').innerHTML =
+        '<div class="placeholder">Hover any county for a quick read; click to lock in the full data here.</div>';
+      return;
+    }
+    document.getElementById('panel-title').textContent = 'County ' + selectedCounty;
+    const data = counties[selectedCounty];
+    const rows = Object.keys(variableMeta).map(key => {
+      const meta = variableMeta[key];
+      const value = formatValue(data[key], meta.fmt);
+      const isCurrent = key === currentVar;
+      return (
+        '<div class="data-row">' +
+          '<span class="data-label">' + meta.label + '</span>' +
+          '<span class="data-value' + (isCurrent ? ' highlight' : '') + '">' + value + '</span>' +
+        '</div>'
+      );
+    }).join('');
+    document.getElementById('panel-content').innerHTML = rows;
+  }
+
+  // ===== TOOLTIP =====
+  const tooltip = document.getElementById('tooltip');
+  function showTooltip(e, countyId) {
+    const meta = variableMeta[currentVar];
+    const v = counties[countyId][currentVar];
+    tooltip.innerHTML = '<strong>County ' + countyId + '</strong><br>' +
+                        meta.label + ': ' + formatValue(v, meta.fmt);
+    tooltip.classList.add('visible');
+    moveTooltip(e);
+  }
+  function moveTooltip(e) {
+    tooltip.style.left = (e.pageX + 14) + 'px';
+    tooltip.style.top  = (e.pageY + 14) + 'px';
+  }
+  function hideTooltip() {
+    tooltip.classList.remove('visible');
+  }
+
+  // ===== EVENTS =====
+  document.querySelectorAll('.county').forEach(el => {
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', 'County ' + el.dataset.county);
+
+    el.addEventListener('mouseenter', e => showTooltip(e, el.dataset.county));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.county').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedCounty = el.dataset.county;
+      renderPanel();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
+
+  document.getElementById('variable-select').addEventListener('change', e => {
+    currentVar = e.target.value;
+    renderChoropleth();
+    renderPanel();
+  });
+
+  // ===== INIT =====
+  renderChoropleth();
+  renderPanel();
+</script>
+</body>
+</html>
