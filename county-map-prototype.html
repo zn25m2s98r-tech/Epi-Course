@@ -34,6 +34,26 @@
   .region:hover { fill:rgba(40,22,8,0.32); }
   .region.selected { fill:rgba(40,22,8,0.42); }
   .region:focus { outline:none; fill:rgba(40,22,8,0.32); }
+  .region2-marker { fill:transparent; stroke:transparent; cursor:default; }
+  .region2-layer { position:fixed; inset:0; z-index:9999; pointer-events:none; overflow:hidden; }
+  .shatter-layer { position:fixed; inset:0; z-index:9998; pointer-events:none; overflow:hidden; }
+  .shard { position:absolute; inset:0; will-change:transform; contain:paint; }
+  .shard-content { position:absolute; left:0; top:0; width:100vw; min-height:100vh; background:#cdbb94; }
+  .shard-content *,.shard-content *::before,.shard-content *::after { animation:none!important; transition:none!important; }
+  .shard-crack { position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 30%,transparent 70%,rgba(166,73,44,.35)); mix-blend-mode:screen; }
+  .page-hidden > :not(.region2-layer):not(.shatter-layer) { visibility:hidden; }
+  .region2-flash { position:absolute; inset:0; background:radial-gradient(circle at var(--region2-x) var(--region2-y),#fff 0%,#ffd36b 12%,#db542f 28%,rgba(95,20,13,.72) 48%,transparent 72%); animation:region2-flash 3s ease-out forwards; }
+  .region2-ring { position:absolute; left:var(--region2-x); top:var(--region2-y); width:30px; height:30px; margin:-15px; border:6px solid #fff2ad; border-radius:50%; box-shadow:0 0 34px #ff552e; animation:region2-ring .9s cubic-bezier(.1,.8,.2,1) forwards; }
+  .region2-debris { position:absolute; left:var(--region2-x); top:var(--region2-y); width:var(--size); height:var(--size); background:var(--color); clip-path:polygon(50% 0,100% 100%,0 75%); box-shadow:0 0 8px var(--color); animation:region2-debris 3s cubic-bezier(.15,.7,.3,1) forwards; }
+  .region2-apology { position:fixed; inset:0; display:grid; place-items:center; color:#fff4d6; font:700 clamp(3rem,10vw,8rem)/1 "Cinzel",serif; text-shadow:0 0 18px #db542f,0 0 55px #000; animation:apology-in 180ms ease-out both; }
+  body.exploding .wrap { animation:none; }
+  .region2-shard { position:fixed; left:var(--region2-x); top:var(--region2-y); width:42vw; height:42vh; margin:-21vw 0 0 -21vh; background:var(--shard-color); clip-path:polygon(50% 0,100% 50%,55% 100%,0 62%); opacity:.95; mix-blend-mode:multiply; animation:region2-shard 900ms cubic-bezier(.12,.72,.2,1) forwards; }
+  @keyframes region2-flash { 0%{opacity:1} 100%{opacity:0} }
+  @keyframes region2-ring { from{transform:scale(0);opacity:1} to{transform:scale(55);opacity:0;border-width:1px} }
+  @keyframes region2-debris { from{transform:translate(0,0) rotate(0);opacity:1} to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0} }
+  @keyframes site-shatter-out { 0%{filter:brightness(1);transform:scale(1) rotate(0);opacity:1} 16%{filter:brightness(3) saturate(2);transform:scale(1.03) rotate(-.8deg);opacity:1} 42%{filter:brightness(.5) contrast(1.6);transform:scale(.72) rotate(.8deg);opacity:.4} 56%,100%{visibility:hidden;opacity:0;transform:scale(.05)} }
+  @keyframes region2-shard { from{transform:translate(0,0) rotate(0) scale(1);opacity:.95} to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.12);opacity:0} }
+  @keyframes apology-in { from{opacity:0;transform:scale(.7)} to{opacity:1;transform:scale(1)} }
   .num-label { pointer-events:none; opacity:.78; transition:opacity .14s ease; }
   .num-label circle { fill:#f4ecd6; stroke:#3a2a17; stroke-width:1.4; }
   .num-label text { font-family:"Cinzel",serif; font-size:22px; font-weight:700;
@@ -104,6 +124,7 @@
 <path class="region" d="M 299.0,1138.5 L 292.0,1137.5 L 288.0,1128.5 L 275.5,1127.0 L 276.5,1117.0 L 272.5,1113.0 L 281.0,1108.5 L 274.0,1103.5 L 259.0,1107.5 L 250.0,1096.5 L 246.0,1102.5 L 238.0,1097.5 L 232.5,1104.0 L 239.5,1115.0 L 236.0,1126.5 L 222.0,1123.5 L 217.0,1115.5 L 203.0,1123.5 L 202.0,1114.5 L 176.5,1113.0 L 185.5,1099.0 L 184.0,1092.5 L 172.0,1096.5 L 170.0,1100.5 L 161.0,1099.5 L 158.0,1107.5 L 147.0,1109.5 L 144.5,1108.0 L 146.0,1100.5 L 131.0,1103.5 L 127.5,1101.0 L 130.5,1093.0 L 127.0,1089.5 L 112.0,1090.5 L 105.5,1083.0 L 114.0,1077.5 L 119.0,1080.5 L 123.5,1076.0 L 124.0,1067.5 L 136.0,1070.5 L 142.5,1066.0 L 142.5,1061.0 L 136.0,1058.5 L 134.5,1051.0 L 128.0,1049.5 L 125.5,1044.0 L 130.0,1039.5 L 139.0,1041.5 L 138.5,1033.0 L 143.0,1029.5 L 148.5,1033.0 L 148.0,1047.5 L 156.0,1049.5 L 159.0,1043.5 L 164.5,1044.0 L 162.5,1058.0 L 171.0,1066.5 L 183.0,1066.5 L 197.0,1075.5 L 205.0,1070.5 L 213.0,1070.5 L 216.5,1064.0 L 206.0,1060.5 L 203.5,1056.0 L 204.0,1052.5 L 211.5,1049.0 L 211.5,1045.0 L 204.5,1040.0 L 200.5,1028.0 L 213.5,1025.0 L 213.5,1019.0 L 207.5,1015.0 L 209.5,1010.0 L 228.5,1003.0 L 217.5,994.0 L 222.0,987.5 L 238.0,984.5 L 243.0,970.5 L 255.0,969.5 L 262.0,976.5 L 275.0,976.5 L 292.5,959.0 L 295.0,949.5 L 302.0,949.5 L 313.0,943.5 L 331.0,946.5 L 336.0,934.5 L 345.0,935.5 L 357.0,930.5 L 369.0,909.5 L 395.0,908.5 L 406.0,921.5 L 424.0,918.5 L 429.0,925.5 L 435.5,928.0 L 435.5,939.0 L 427.5,948.0 L 429.5,954.0 L 446.5,963.0 L 445.5,974.0 L 434.5,981.0 L 432.5,992.0 L 435.0,996.5 L 450.0,1001.5 L 455.5,1007.0 L 455.5,1016.0 L 443.5,1023.0 L 442.0,1033.5 L 424.5,1038.0 L 421.5,1043.0 L 422.5,1052.0 L 414.5,1054.0 L 412.5,1068.0 L 408.0,1068.5 L 403.0,1075.5 L 392.0,1077.5 L 381.0,1067.5 L 366.0,1067.5 L 356.5,1075.0 L 350.0,1089.5 L 335.0,1089.5 L 331.0,1095.5 L 316.0,1097.5 L 313.5,1106.0 L 316.5,1114.0 L 302.5,1122.0 L 299.0,1138.5 Z" data-id="11" tabindex="0" role="button" aria-label="County 11, Tobermory. Press Enter to view its data."></path>
 <path class="region" d="M 330.0,1342.5 L 325.5,1341.0 L 329.5,1333.0 L 328.0,1324.5 L 319.0,1328.5 L 309.0,1327.5 L 305.5,1331.0 L 306.5,1336.0 L 302.0,1338.5 L 285.0,1338.5 L 283.5,1335.0 L 294.0,1330.5 L 299.5,1320.0 L 292.0,1318.5 L 284.0,1321.5 L 277.5,1319.0 L 283.0,1310.5 L 291.5,1307.0 L 290.0,1301.5 L 284.5,1301.0 L 283.5,1293.0 L 288.0,1289.5 L 292.0,1289.5 L 295.0,1294.5 L 311.0,1292.5 L 313.5,1287.0 L 305.5,1282.0 L 305.5,1278.0 L 321.0,1272.5 L 322.5,1265.0 L 340.5,1251.0 L 338.5,1234.0 L 348.0,1226.5 L 359.0,1227.5 L 365.5,1221.0 L 363.5,1203.0 L 350.5,1195.0 L 352.5,1176.0 L 339.0,1170.5 L 324.0,1174.5 L 305.5,1160.0 L 307.5,1141.0 L 299.5,1139.0 L 300.5,1126.0 L 304.0,1120.5 L 315.5,1116.0 L 315.5,1098.0 L 331.0,1095.5 L 335.0,1089.5 L 350.0,1089.5 L 356.5,1075.0 L 366.0,1067.5 L 381.0,1067.5 L 392.0,1077.5 L 401.0,1076.5 L 408.0,1068.5 L 412.5,1068.0 L 415.0,1053.5 L 423.0,1050.5 L 440.0,1058.5 L 448.0,1055.5 L 455.0,1046.5 L 465.0,1045.5 L 473.5,1050.0 L 471.5,1063.0 L 475.0,1065.5 L 490.0,1064.5 L 493.0,1058.5 L 507.5,1065.0 L 509.5,1073.0 L 496.5,1087.0 L 501.0,1094.5 L 514.0,1095.5 L 520.0,1100.5 L 535.0,1099.5 L 538.5,1092.0 L 544.0,1089.5 L 548.0,1089.5 L 552.0,1095.5 L 566.0,1092.5 L 573.0,1094.5 L 574.5,1103.0 L 565.5,1117.0 L 571.0,1122.5 L 584.0,1123.5 L 582.5,1127.0 L 587.5,1130.0 L 587.5,1138.0 L 583.0,1142.5 L 574.0,1143.5 L 557.0,1160.5 L 550.5,1158.0 L 550.5,1151.0 L 546.0,1146.5 L 533.5,1151.0 L 539.5,1159.0 L 536.5,1169.0 L 546.5,1179.0 L 542.0,1187.5 L 530.0,1185.5 L 525.5,1190.0 L 527.5,1198.0 L 533.5,1201.0 L 532.0,1208.5 L 522.0,1211.5 L 519.0,1207.5 L 511.0,1206.5 L 506.5,1211.0 L 507.5,1217.0 L 497.5,1222.0 L 496.5,1227.0 L 501.0,1232.5 L 519.5,1231.0 L 515.0,1238.5 L 508.5,1241.0 L 507.5,1253.0 L 502.0,1258.5 L 485.0,1260.5 L 481.0,1273.5 L 471.0,1271.5 L 463.0,1281.5 L 456.5,1279.0 L 461.5,1265.0 L 449.0,1261.5 L 445.5,1269.0 L 434.5,1276.0 L 435.5,1282.0 L 443.0,1283.5 L 443.5,1288.0 L 437.5,1293.0 L 438.5,1300.0 L 432.0,1305.5 L 426.5,1302.0 L 427.5,1295.0 L 420.0,1286.5 L 416.0,1286.5 L 408.5,1293.0 L 413.5,1303.0 L 411.5,1308.0 L 402.0,1310.5 L 398.0,1319.5 L 389.0,1321.5 L 386.5,1318.0 L 388.5,1312.0 L 378.0,1302.5 L 368.5,1312.0 L 373.5,1319.0 L 371.0,1324.5 L 361.0,1331.5 L 352.0,1326.5 L 345.0,1337.5 L 330.0,1342.5 Z" data-id="12" tabindex="0" role="button" aria-label="County 12, Lavenham. Press Enter to view its data."></path>
 <path class="region" d="M 331.0,1355.5 L 325.0,1354.5 L 313.0,1342.5 L 300.0,1352.5 L 295.0,1348.5 L 290.0,1352.5 L 283.0,1351.5 L 269.5,1338.0 L 274.5,1330.0 L 271.0,1326.5 L 261.0,1335.5 L 257.0,1333.5 L 243.5,1320.0 L 247.5,1312.0 L 242.0,1308.5 L 236.0,1309.5 L 222.5,1296.0 L 223.5,1292.0 L 219.0,1287.5 L 212.0,1294.5 L 209.0,1292.5 L 205.0,1295.5 L 182.5,1271.0 L 212.5,1241.0 L 211.0,1238.5 L 183.0,1259.5 L 177.0,1250.5 L 158.0,1246.5 L 156.0,1241.5 L 145.0,1244.5 L 137.5,1238.0 L 142.0,1231.5 L 153.0,1233.5 L 157.0,1229.5 L 171.5,1226.0 L 173.5,1222.0 L 168.5,1217.0 L 183.5,1210.0 L 179.5,1200.0 L 188.0,1187.5 L 178.0,1182.5 L 167.0,1183.5 L 165.0,1189.5 L 159.0,1189.5 L 152.0,1196.5 L 144.5,1193.0 L 147.0,1181.5 L 134.0,1181.5 L 129.5,1185.0 L 129.5,1192.0 L 124.0,1194.5 L 118.0,1185.5 L 112.5,1184.0 L 112.5,1176.0 L 122.0,1175.5 L 123.0,1168.5 L 133.0,1171.5 L 139.5,1165.0 L 139.5,1154.0 L 143.0,1150.5 L 162.0,1154.5 L 166.5,1151.0 L 167.5,1138.0 L 182.0,1135.5 L 188.0,1124.5 L 206.0,1123.5 L 217.0,1115.5 L 222.0,1123.5 L 236.0,1126.5 L 239.5,1115.0 L 232.5,1104.0 L 238.0,1097.5 L 246.0,1102.5 L 250.0,1096.5 L 259.0,1107.5 L 274.0,1103.5 L 281.0,1108.5 L 272.5,1113.0 L 276.5,1117.0 L 275.5,1127.0 L 288.0,1128.5 L 292.0,1137.5 L 307.5,1141.0 L 305.5,1160.0 L 309.0,1164.5 L 316.0,1165.5 L 322.0,1173.5 L 332.0,1174.5 L 339.0,1170.5 L 352.0,1175.5 L 350.5,1195.0 L 363.5,1203.0 L 365.5,1217.0 L 364.5,1223.0 L 359.0,1227.5 L 348.0,1226.5 L 338.5,1234.0 L 340.5,1251.0 L 322.5,1265.0 L 321.0,1272.5 L 305.5,1278.0 L 305.5,1282.0 L 313.5,1287.0 L 311.0,1292.5 L 295.0,1294.5 L 292.0,1289.5 L 288.0,1289.5 L 283.5,1293.0 L 284.5,1301.0 L 290.0,1301.5 L 291.5,1307.0 L 283.0,1310.5 L 277.5,1319.0 L 284.0,1321.5 L 292.0,1318.5 L 299.5,1320.0 L 294.0,1330.5 L 283.5,1335.0 L 285.0,1338.5 L 302.0,1338.5 L 306.5,1336.0 L 305.5,1331.0 L 309.0,1327.5 L 319.0,1328.5 L 328.0,1324.5 L 329.5,1333.0 L 325.5,1341.0 L 341.0,1339.5 L 347.5,1335.0 L 350.0,1327.5 L 356.0,1326.5 L 361.0,1331.5 L 371.0,1324.5 L 373.5,1319.0 L 368.5,1312.0 L 378.0,1302.5 L 388.5,1312.0 L 387.5,1320.0 L 394.0,1321.5 L 399.5,1318.0 L 402.0,1310.5 L 411.5,1308.0 L 413.5,1303.0 L 408.5,1293.0 L 416.0,1286.5 L 420.0,1286.5 L 427.5,1295.0 L 426.5,1302.0 L 432.0,1305.5 L 438.5,1300.0 L 437.5,1293.0 L 443.5,1288.0 L 443.0,1283.5 L 435.5,1282.0 L 434.5,1276.0 L 443.0,1271.5 L 449.0,1261.5 L 461.5,1265.0 L 456.5,1279.0 L 463.0,1281.5 L 471.0,1271.5 L 481.0,1273.5 L 485.0,1260.5 L 502.0,1258.5 L 508.5,1251.0 L 508.5,1241.0 L 515.0,1238.5 L 526.0,1224.5 L 532.5,1231.0 L 520.5,1247.0 L 521.5,1252.0 L 508.0,1265.5 L 499.0,1272.5 L 496.0,1270.5 L 477.0,1288.5 L 474.0,1285.5 L 462.0,1294.5 L 454.0,1290.5 L 450.5,1294.0 L 452.5,1300.0 L 433.0,1317.5 L 428.0,1318.5 L 421.0,1311.5 L 399.0,1332.5 L 391.0,1335.5 L 381.0,1327.5 L 363.0,1343.5 L 355.0,1341.5 L 342.0,1352.5 L 336.0,1351.5 L 331.0,1355.5 Z" data-id="13" tabindex="0" role="button" aria-label="County 13, Staithes. Press Enter to view its data."></path>
+<circle class="region2-marker" cx="195" cy="250" r="130" tabindex="0" role="button" aria-label="Map region 2"></circle>
 <g class="num-label" data-id="1" transform="translate(592.4,268.8)"><circle r="22"></circle><text>1</text></g>
 <g class="num-label" data-id="2" transform="translate(375.4,820.5)"><circle r="22"></circle><text>2</text></g>
 <g class="num-label" data-id="3" transform="translate(789.8,295.0)"><circle r="22"></circle><text>3</text></g>
@@ -195,7 +216,181 @@
       el.classList.toggle('selected', String(el.dataset.id) === String(id)));
     render(id);
   }
-  document.querySelectorAll('.region').forEach(el => {
+  // Counties 2 and 7 in the supplied hit layer were self-intersecting paths.
+  // These contours were retraced from the map's visible black border network.
+  const correctedRegions = {
+    '2': 'M 489,720 L 470,717 L 456,697 L 439,696 L 436,687 L 421,681 L 412,691 L 396,688 L 390,678 L 377,694 L 368,670 L 356,663 L 367,657 L 357,633 L 342,632 L 339,656 L 333,659 L 323,652 L 321,662 L 313,666 L 290,654 L 288,662 L 274,668 L 265,639 L 266,647 L 257,658 L 246,658 L 244,651 L 231,656 L 232,666 L 238,664 L 250,673 L 246,680 L 239,678 L 237,686 L 229,680 L 227,689 L 219,681 L 204,681 L 204,660 L 179,667 L 175,676 L 183,684 L 170,699 L 186,702 L 201,690 L 204,694 L 196,707 L 215,708 L 222,725 L 241,722 L 240,740 L 258,742 L 261,733 L 256,726 L 262,716 L 267,727 L 280,731 L 269,745 L 273,750 L 286,746 L 295,756 L 306,746 L 322,747 L 329,738 L 327,729 L 336,727 L 340,746 L 354,754 L 334,764 L 332,772 L 317,769 L 306,779 L 303,773 L 293,773 L 284,788 L 272,794 L 270,807 L 279,815 L 268,829 L 278,843 L 273,858 L 264,860 L 263,852 L 252,853 L 248,892 L 236,899 L 230,917 L 212,922 L 206,930 L 210,948 L 200,959 L 189,960 L 182,974 L 170,976 L 166,988 L 184,991 L 194,978 L 202,987 L 210,975 L 227,974 L 229,962 L 252,955 L 253,946 L 269,932 L 273,937 L 263,959 L 295,953 L 302,943 L 322,941 L 318,936 L 325,931 L 331,937 L 336,930 L 354,929 L 360,915 L 374,905 L 394,904 L 409,917 L 450,922 L 457,912 L 456,900 L 474,893 L 481,882 L 472,866 L 477,860 L 492,859 L 500,839 L 469,825 L 471,813 L 463,800 L 479,777 L 488,780 L 482,754 L 491,748 L 486,735 Z',
+    '7': 'M 869,470 L 859,471 L 848,489 L 801,487 L 794,475 L 775,478 L 770,495 L 758,498 L 754,516 L 735,525 L 731,546 L 718,543 L 701,553 L 682,554 L 697,565 L 693,577 L 684,575 L 679,582 L 688,619 L 708,623 L 713,645 L 736,662 L 737,687 L 715,705 L 718,717 L 713,726 L 732,739 L 730,757 L 720,761 L 723,772 L 736,778 L 735,790 L 762,790 L 769,810 L 781,815 L 788,837 L 774,866 L 783,870 L 784,880 L 793,882 L 790,886 L 813,879 L 817,865 L 834,855 L 859,867 L 871,866 L 874,874 L 883,876 L 885,867 L 902,852 L 900,838 L 913,831 L 902,820 L 904,794 L 887,787 L 884,773 L 898,755 L 890,749 L 887,733 L 876,733 L 866,724 L 873,708 L 881,713 L 891,709 L 892,700 L 881,698 L 874,685 L 885,671 L 878,662 L 880,652 L 889,647 L 889,631 L 879,619 L 870,624 L 861,620 L 847,602 L 848,579 L 859,574 L 860,554 L 846,549 L 848,524 L 837,513 L 858,517 L 859,528 L 871,535 L 881,530 L 877,515 L 868,513 L 884,505 L 886,493 L 877,489 L 876,475 Z',
+    '13': 'M 231,1103 L 232,1118 L 221,1118 L 217,1140 L 211,1141 L 212,1156 L 195,1170 L 204,1166 L 208,1175 L 198,1217 L 190,1226 L 177,1227 L 178,1218 L 188,1215 L 169,1214 L 170,1226 L 152,1232 L 142,1229 L 135,1239 L 166,1250 L 172,1239 L 186,1247 L 196,1230 L 228,1222 L 233,1211 L 249,1206 L 245,1221 L 226,1235 L 227,1246 L 212,1252 L 211,1264 L 198,1264 L 194,1271 L 205,1284 L 220,1274 L 224,1282 L 240,1276 L 234,1297 L 246,1299 L 263,1288 L 265,1270 L 280,1280 L 292,1252 L 298,1253 L 298,1262 L 309,1263 L 318,1252 L 337,1251 L 336,1232 L 363,1218 L 362,1206 L 348,1197 L 350,1177 L 322,1177 L 304,1163 L 303,1148 L 288,1140 L 277,1141 L 273,1152 L 263,1151 L 261,1144 L 250,1145 L 237,1131 L 240,1114 Z'
+  };
+  for (const [id, path] of Object.entries(correctedRegions)) {
+    document.querySelector(`.region[data-id="${id}"]`).setAttribute('d', path);
+  }
+  // County 4's outline is a valid border trace. Subtract it from county 2 so
+  // the coastal peninsula cannot render as (or be selected as) county 2.
+  const svg = document.querySelector('svg.hit');
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const county2Mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
+  county2Mask.setAttribute('id', 'county-2-mask');
+  const visibleArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  visibleArea.setAttribute('width', '1086');
+  visibleArea.setAttribute('height', '1448');
+  visibleArea.setAttribute('fill', 'white');
+  const excludedCounty4 = document.querySelector('.region[data-id="4"]').cloneNode(false);
+  excludedCounty4.style.fill = 'black';
+  // The original path also leaked into two detached islets north-west of county 2.
+  const detachedCoastA = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  detachedCoastA.setAttribute('cx', '203');
+  detachedCoastA.setAttribute('cy', '710');
+  detachedCoastA.setAttribute('rx', '38');
+  detachedCoastA.setAttribute('ry', '34');
+  detachedCoastA.style.fill = 'black';
+  const detachedCoastB = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  detachedCoastB.setAttribute('cx', '262');
+  detachedCoastB.setAttribute('cy', '737');
+  detachedCoastB.setAttribute('rx', '48');
+  detachedCoastB.setAttribute('ry', '42');
+  detachedCoastB.style.fill = 'black';
+  county2Mask.append(visibleArea, excludedCounty4, detachedCoastA, detachedCoastB);
+  defs.append(county2Mask);
+  svg.prepend(defs);
+  document.querySelector('.region[data-id="2"]').setAttribute('mask', 'url(#county-2-mask)');
+
+  let region2Busy = false;
+  function buildShatterSnapshot() {
+    const snapshot = document.createElement('div');
+    snapshot.className = 'shard-content';
+    [...document.body.children].forEach(node => {
+      if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+      if (node.classList.contains('region2-layer') || node.classList.contains('shatter-layer')) return;
+      snapshot.appendChild(node.cloneNode(true));
+    });
+    snapshot.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    return snapshot;
+  }
+  function shatterPage(x, y) {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const rows = 4;
+    const cols = 4;
+    const points = [];
+    for (let row = 0; row <= rows; row += 1) {
+      points[row] = [];
+      for (let col = 0; col <= cols; col += 1) {
+        let px = (col / cols) * width;
+        let py = (row / rows) * height;
+        if (col > 0 && col < cols) px += (Math.random() - .5) * width / cols * .45;
+        if (row > 0 && row < rows) py += (Math.random() - .5) * height / rows * .45;
+        points[row][col] = [px, py];
+      }
+    }
+    const layer = document.createElement('div');
+    layer.className = 'shatter-layer';
+    const snapshot = buildShatterSnapshot();
+    const shards = [];
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        const corners = [points[row][col], points[row][col + 1], points[row + 1][col + 1], points[row + 1][col]];
+        const shard = document.createElement('div');
+        shard.className = 'shard';
+        shard.style.clipPath = `polygon(${corners.map(([px, py]) => `${px}px ${py}px`).join(',')})`;
+        const centerX = corners.reduce((sum, point) => sum + point[0], 0) / 4;
+        const centerY = corners.reduce((sum, point) => sum + point[1], 0) / 4;
+        shard.style.transformOrigin = `${centerX}px ${centerY}px`;
+        shard.append(snapshot.cloneNode(true));
+        const crack = document.createElement('div');
+        crack.className = 'shard-crack';
+        shard.appendChild(crack);
+        layer.appendChild(shard);
+        shards.push({ shard, centerX, centerY });
+      }
+    }
+    document.body.appendChild(layer);
+    document.body.classList.add('page-hidden');
+    const maxDistance = Math.hypot(width, height);
+    shards.forEach(({ shard, centerX, centerY }) => {
+      const dx = centerX - x;
+      const dy = centerY - y;
+      const distance = Math.hypot(dx, dy) || 1;
+      const force = maxDistance * (.72 + Math.random() * .38);
+      const outX = dx / distance * force;
+      const outY = dy / distance * force;
+      shard.animate([
+        { transform:'translate(0,0) rotate(0deg) scale(1)' },
+        { transform:`translate(${outX}px,${outY}px) rotate(${Math.random() * 720 - 360}deg) scale(.65)` }
+      ], { duration:3000, easing:'cubic-bezier(.3,.4,.5,1)', fill:'forwards' });
+    });
+    setTimeout(() => {
+      layer.remove();
+      document.body.classList.remove('page-hidden');
+    }, 3000);
+  }
+  function explodePage(event) {
+    if (region2Busy) return;
+    region2Busy = true;
+    const x = event.clientX;
+    const y = event.clientY;
+    document.documentElement.style.setProperty('--region2-x', `${x}px`);
+    document.documentElement.style.setProperty('--region2-y', `${y}px`);
+    document.body.classList.add('exploding');
+    const layer = document.createElement('div');
+    layer.className = 'region2-layer';
+    layer.style.setProperty('--region2-x', `${x}px`);
+    layer.style.setProperty('--region2-y', `${y}px`);
+    layer.innerHTML = '<div class="region2-flash"></div><div class="region2-ring"></div><div class="region2-ring" style="animation-delay:120ms"></div>';
+    for (let i = 0; i < 90; i += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 140 + Math.random() * 1050;
+      const bit = document.createElement('i');
+      bit.className = 'region2-debris';
+      bit.style.setProperty('--region2-x', `${x}px`);
+      bit.style.setProperty('--region2-y', `${y}px`);
+      bit.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+      bit.style.setProperty('--dy', `${Math.sin(angle) * distance + 160}px`);
+      bit.style.setProperty('--rot', `${Math.random() * 1440 - 720}deg`);
+      bit.style.setProperty('--size', `${5 + Math.random() * 18}px`);
+      bit.style.setProperty('--color', ['#fff4b5', '#ffb13b', '#e64a2d', '#4a2519'][i % 4]);
+      layer.appendChild(bit);
+    }
+    for (let i = 0; i < 18; i += 1) {
+      const shard = document.createElement('i');
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 220 + Math.random() * 900;
+      shard.className = 'region2-shard';
+      shard.style.setProperty('--region2-x', `${x}px`);
+      shard.style.setProperty('--region2-y', `${y}px`);
+      shard.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+      shard.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+      shard.style.setProperty('--rot', `${Math.random() * 1080 - 540}deg`);
+      shard.style.setProperty('--shard-color', ['#e8d8b5', '#cdbb94', '#6b4e2e', '#f4ecd6'][i % 4]);
+      layer.appendChild(shard);
+    }
+    document.body.appendChild(layer);
+    shatterPage(x, y);
+    setTimeout(() => {
+      layer.replaceChildren();
+      const apology = document.createElement('div');
+      apology.className = 'region2-apology';
+      apology.textContent = 'sorry lol';
+      layer.appendChild(apology);
+    }, 3000);
+    setTimeout(() => {
+      layer.remove();
+      document.body.classList.remove('exploding');
+      region2Busy = false;
+    }, 4000);
+  }
+  const region2Trigger = document.querySelector('.region2-marker');
+  region2Trigger.addEventListener('click', explodePage);
+  region2Trigger.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      const box = region2Trigger.getBoundingClientRect();
+      explodePage({ clientX: box.left + box.width / 2, clientY: box.top + box.height / 2 });
+    }
+  });
+
+  document.querySelectorAll('.region:not(.region-14)').forEach(el => {
     el.addEventListener('click', () => select(el.dataset.id));
     el.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(el.dataset.id); }
